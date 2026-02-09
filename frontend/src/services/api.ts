@@ -15,7 +15,7 @@ export const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 60000, // 60 seconds for quantum simulations
+    timeout: 120000, // 120 seconds for quantum simulations (E91 can be slow)
 });
 
 // Request interceptor

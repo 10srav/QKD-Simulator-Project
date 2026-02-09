@@ -61,17 +61,25 @@ class CHSHValidator:
         bob_angles = sorted(list(available_bob))
         
         # Calculate S-parameter using available angles
+        # For maximum CHSH violation with angles [0,45,90] and [45,90,135]:
+        # Use: a=0, a'=90, b=45, b'=135 → gives S ≈ 2√2
         if len(alice_angles) >= 2 and len(bob_angles) >= 2:
-            a, a_prime = alice_angles[0], alice_angles[1]
-            b, b_prime = bob_angles[0], bob_angles[1]
-            
+            # Select angles for maximum violation
+            # Alice: use first and last (0, 90) for maximum spread
+            # Bob: use first and last (45, 135) for maximum spread
+            a = alice_angles[0]  # 0°
+            a_prime = alice_angles[-1] if len(alice_angles) > 2 else alice_angles[1]  # 90° or 45°
+            b = bob_angles[0]  # 45°
+            b_prime = bob_angles[-1] if len(bob_angles) > 2 else bob_angles[1]  # 135° or 90°
+
             E_ab = self._get_correlation(correlations, a, b)
             E_ab_prime = self._get_correlation(correlations, a, b_prime)
             E_a_prime_b = self._get_correlation(correlations, a_prime, b)
             E_a_prime_b_prime = self._get_correlation(correlations, a_prime, b_prime)
-            
-            # CHSH formula
-            S = abs(E_ab + E_ab_prime + E_a_prime_b - E_a_prime_b_prime)
+
+            # CHSH formula: S = |E(a,b) - E(a,b') + E(a',b) + E(a',b')|
+            # Note: The sign pattern matters for maximum violation
+            S = abs(E_ab - E_ab_prime + E_a_prime_b + E_a_prime_b_prime)
             
             return {
                 "s_parameter": round(S, 4),
